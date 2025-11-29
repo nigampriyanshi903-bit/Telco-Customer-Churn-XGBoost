@@ -1,35 +1,45 @@
 # Telco-Customer-Churn-XGBoost
 
-## Project Overview
+This project is an end-to-end Machine Learning solution focused on **predicting customer churn** within the telecom sector and developing actionable retention strategies. We used the Telco Customer Churn dataset.
 
-This is an end-to-end Machine Learning project focused on **Customer Churn Prediction** using the IBM Telco Customer Churn dataset. The goal is to build a high-performance classification model to identify 'at-risk' customers and derive actionable business strategies for retention.
+##  Project Goal
 
-## Key Techniques Used
+The primary goal was to build a highly **sensitive classification model** (maximizing Recall) to accurately flag 'at-risk' customers so that timely retention efforts can be deployed.
 
-* **Model:** Gradient Boosting Machine (**XGBoost**)
-* **Problem:** Binary Classification (Imbalanced data, Churn Rate $\approx 26.54\%$)
-* **Preprocessing:** One-Hot Encoding, Handling missing values (e.g., in `TotalCharges`), and scaling.
-* **Imbalance Handling:** Used `scale_pos_weight` in XGBoost for better recall.
-* **Output:** Model evaluation, Feature Importance analysis, and A/B Testing strategy.
+---
 
-##  Model Performance Highlights
+##  Methodology & Model Performance
 
-The XGBoost model was trained and evaluated on a test set of 2113 samples, prioritizing the identification of churning customers (Class 1).
+### 1. Data Processing and Baseline
+* **Imbalance Handling:** The target variable (Churn $\approx 26.54\%$) was imbalanced. This was addressed using the `scale_pos_weight` parameter in XGBoost.
+* **Initial Model:** The untuned XGBoost model achieved a Churn Recall of **$0.67$**.
 
-| Metric | Churn (Class 1) |
-| :--- | :--- |
-| **Recall** | **$0.67$** |
-| **Precision** | **$0.54$** |
-| **Accuracy** | $0.76$ |
+### 2. Hyperparameter Tuning (Optimization)
+* **Technique:** **Grid Search** was performed to optimize hyperparameters.
+* **Best Parameters:** `{'gamma': 0, 'learning_rate': 0.05, 'max_depth': 3, 'n_estimators': 200}`.
 
-##  Key Findings & Business Insights
+### 3. Final Tuned Model Evaluation
 
-Feature Importance analysis (F-Score) clearly identified the primary drivers of customer churn:
+| Metric | Previous Model (Untuned) | **Tuned Final Model** |
+| :--- | :--- | :--- |
+| **Accuracy** | $0.76$ | **$0.75$** |
+| **Recall (Churn - Class 1)** | $0.67$ | **$0.81$** |
+| **Precision (Churn - Class 1)** | $0.54$ | **$0.51$** |
 
-1.  **MonthlyCharges:** The single strongest predictor of churn.
-2.  **TotalCharges** / **tenure:** Low tenure (new customers) and overall high spending indicate high risk.
-3.  **PaymentMethod_Electronic check:** This payment method is associated with higher churn risk.
+* **Result:** Tuning successfully increased **Recall by 14% points** (from 0.67 to 0.81). This improvement significantly reduced **False Negatives** (missed churn cases) from 187 to 106, making the model highly valuable for business use.
 
-###  Business Recommendation
+---
 
-A strategy focused on reducing **Monthly Charges** for high-risk customers (e.g., targeted discounts) and incentivizing a shift away from Electronic Check payments is recommended.
+##  Key Churn Drivers & Business Recommendation
+
+Feature Importance analysis identified the factors most strongly correlated with customer departure: 
+
+1.  **Financial Factors:** **`MonthlyCharges`** is the single strongest driver, followed by low **`tenure`** and high **`TotalCharges`**.
+2.  **Payment Risk:** The payment method **`Electronic check`** is significantly associated with higher churn risk.
+
+###  Retention Strategy
+
+Leveraging the model's high Recall ($0.81$), the company should implement a **Targeted Retention Program**:
+
+* **Offer Incentives:** Target customers with high `MonthlyCharges` and those using `Electronic check` with **long-term contract discounts** or **loyalty upgrades**.
+* **Strategy Validation:** Implement **A/B Testing** to measure the financial impact and effectiveness of these targeted campaigns before full deployment.
